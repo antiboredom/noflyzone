@@ -14,6 +14,11 @@ HIDE_DATE = True
 with open("text-to-speech-key.json", "r") as infile:
     KEYS = json.load(infile)
 
+token_url = "https://eastus.api.cognitive.microsoft.com/sts/v1.0/issuetoken"
+headers = {"Ocp-Apim-Subscription-Key": KEYS["ms_key"]}
+response = requests.post(token_url, headers=headers)
+access_token = str(response.text)
+
 
 def get_data():
     session = HTMLSession()
@@ -81,11 +86,6 @@ def synthesize_local(text, outname):
 
 
 def synthesize_ms(text, outname):
-    token_url = "https://eastus.api.cognitive.microsoft.com/sts/v1.0/issuetoken"
-    headers = {"Ocp-Apim-Subscription-Key": KEYS["ms_key"]}
-    response = requests.post(token_url, headers=headers)
-    access_token = str(response.text)
-
     url = "https://eastus.tts.speech.microsoft.com/cognitiveservices/v1"
     headers = {
         "Authorization": "Bearer " + access_token,
@@ -133,8 +133,9 @@ def main():
     for country, text in items:
 
         print(country, text)
+        safe_name = re.sub("[^aA-zZ]", "", counry)
 
-        outname = "recordings/{}.wav".format(country)
+        outname = "recordings/{}.wav".format(safe_name)
 
         text = country + "... \n" + text
 

@@ -3,6 +3,7 @@ text-to-speech-key.json
 .DS_Store
 __pycache__
 testing/
+concatlist.txt
 *.wav
 *.mp3
 *.mp4
