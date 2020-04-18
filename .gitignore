@@ -5,5 +5,4 @@ __pycache__
 testing/
 concatlist.txt
 *.wav
-*.mp3
 *.mp4

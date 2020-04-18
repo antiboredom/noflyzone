@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>No Fly Free Zone</title>
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.js"></script>
+    <link
+      href="https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.css"
+      rel="stylesheet"
+    />
+    <script src="https://unpkg.com/deck.gl@latest/dist.min.js"></script>
+    <link href="style.css" rel="stylesheet" />
+    <style></style>
+  </head>
+  <body>
+    <div id="tooltip"></div>
+    <button id="radio-button">
+      <h1>No Fly Free Zone</h1>
+      <p>
+        Rule One: Every rule has an exception, but no one is sure what it is.
+      </p>
+      <p>
+        Every day IATA (International Air Transport Association) publishes an
+        updated set of rules from member states defining who is and isn’t
+        permitted to enter the respective countries under various Covid-19
+        lockdown regimes. Each day this list grows longer with contronyms,
+        paradoxes, and complex, seemingly arbitrary sub-clauses that produce
+        multifold exceptions. The more information-rich this schematic becomes
+        the less legible it is. Occasionally, new parameters clash with prior
+        parameters and apparently contradictory guidelines are obtained. Some
+        rules disappear entirely without explanation. This is a process by which
+        an explicit and temporary state of exception becomes an overt and
+        semi-permanent anomaly that is integrated in the normal run of quotidian
+        life. A condition in which the definitive interpretation of the rule
+        belongs solely to those who impose it. While observing the process of
+        global reterritorialization doesn’t always make clear who is and isn’t
+        permitted to cross which borders, the overarching mechanisms and ensuing
+        chaos that produces the state of exception becomes briefly traceable.
+      </p>
+      <h2>&#9658; Listen</h2>
+    </button>
+    <audio id="radio" src="radio.mp3" loop></audio>
+    <script src="app.js"></script>
+  </body>
+</html>

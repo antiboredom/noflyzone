@@ -1,0 +1,54 @@
+body {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  background: rgb(26, 26, 26);
+  color: #fff;
+  font-size: 18px;
+  font-family: helvetica, sans-serif;
+}
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+#tooltip {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+#radio-button {
+  font-size: 18px;
+  position: fixed;
+  z-index: 999;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.9);
+  color: #fff;
+  border: 0;
+  flex-direction: column;
+  font-family: helvetica, sans-serif;
+  text-align: left;
+  line-height: 1.3;
+}
+#radio-button h2, #radio-button h1, #radio-button p {
+  max-width: 600px;
+  width: 100%;
+  margin: 0;
+  margin: 20px 0px;
+}
+#radio-button h1 {
+  font-size: 50px;
+}
+#radio-button h2 {
+  font-size: 40px;
+}

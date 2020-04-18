@@ -14,11 +14,6 @@ HIDE_DATE = True
 with open("text-to-speech-key.json", "r") as infile:
     KEYS = json.load(infile)
 
-token_url = "https://eastus.api.cognitive.microsoft.com/sts/v1.0/issuetoken"
-headers = {"Ocp-Apim-Subscription-Key": KEYS["ms_key"]}
-response = requests.post(token_url, headers=headers)
-access_token = str(response.text)
-
 
 def get_data():
     session = HTMLSession()
@@ -27,6 +22,12 @@ def get_data():
     )
 
     content = r.html.find(".middle", first=True).text
+
+    data_filename = time.strftime("%Y-%m-%d-%H-%M") + ".txt"
+    with open("data/" + data_filename, "w") as outfile:
+        outfile.write(content)
+
+    content = content.replace("–", "-")
 
     content = re.sub("\n{2,}", "\n\n", content)
 
@@ -86,6 +87,11 @@ def synthesize_local(text, outname):
 
 
 def synthesize_ms(text, outname):
+    token_url = "https://eastus.api.cognitive.microsoft.com/sts/v1.0/issuetoken"
+    headers = {"Ocp-Apim-Subscription-Key": KEYS["ms_key"]}
+    response = requests.post(token_url, headers=headers)
+    access_token = str(response.text)
+
     url = "https://eastus.tts.speech.microsoft.com/cognitiveservices/v1"
     headers = {
         "Authorization": "Bearer " + access_token,
@@ -113,9 +119,6 @@ def synthesize_ms(text, outname):
 
     response = requests.post(url, headers=headers, data=body)
 
-    if outname is None:
-        outname = "sample-" + self.timestr + ".wav"
-
     if response.status_code == 200:
         with open(outname, "wb") as audio:
             audio.write(response.content)
@@ -133,7 +136,7 @@ def main():
     for country, text in items:
 
         print(country, text)
-        safe_name = re.sub("[^aA-zZ]", "", counry)
+        safe_name = re.sub("[^aA-zZ]", "", country)
 
         outname = "recordings/{}.wav".format(safe_name)
 
@@ -145,6 +148,8 @@ def main():
         except Exception as e:
             print(e)
             continue
+
+        time.sleep(3)
 
 
 if __name__ == "__main__":
