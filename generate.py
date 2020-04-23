@@ -301,9 +301,9 @@ def main():
     #
     # return False
 
-    # items = get_data()
-    # create_recordings(items)
-    # add_effects()
+    items = get_data()
+    create_recordings(items)
+    add_effects()
     stitch2()
 
 
