@@ -24,7 +24,12 @@
     <div class="container">
       <div class="inner-container">
         <div>
-          <h1>NO FLY FREE ZONE</h1>
+          <header>
+            <h1>NO FLY FREE ZONE</h1>
+            <button id="radio-button">
+              &#9658; Play
+            </button>
+          </header>
           <p>
             Rule One: Every rule has an exception, but no one is sure what it
             is.
@@ -64,13 +69,10 @@
             <a href="https://lav.io">Sam Lavigne</a>.
           </p>
 
-          <button id="radio-button">
-            &#9658; Play
-          </button>
         </div>
       </div>
     </div>
-    <audio id="radio" src="radio.mp3" loop></audio>
+    <audio id="radio" src="radio.mp3" loop autoplay></audio>
     <script src="app.js"></script>
   </body>
 </html>

@@ -18,6 +18,11 @@ function deg2rad(deg) {
 }
 
 async function init() {
+  const play = document.getElementById("radio-button");
+  const audio = document.getElementById("radio");
+  const about = document.getElementById("about");
+  const container = document.querySelector(".inner-container");
+
   let res = await fetch("parsed_results.json");
   let data = await res.json();
 
@@ -119,12 +124,10 @@ async function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  const play = document.getElementById("radio-button");
-  const audio = document.getElementById("radio");
-  const about = document.getElementById("about");
-  const container = document.querySelector(".inner-container");
-
   play.addEventListener("click", () => {
+    // const starttime = Math.floor((new Date().getTime() / 1000) % audio.duration)
+    // console.log(starttime);
+    // audio.currentTime = starttime;
     audio.play();
     // container.style.display = "none";
     // document.querySelector(".container").style.background =
