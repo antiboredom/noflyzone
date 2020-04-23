@@ -157,7 +157,9 @@ def add_effects():
 
 
 def stitch2():
-    files = sorted(glob("recordings/*.mixed.wav"))
+    files = glob("recordings/*.mixed.wav")
+    random.shuffle(files)
+
     out = []
     for f in files:
         out.append(f)
@@ -222,7 +224,7 @@ def stitch():
     fg_track = AudioSegment.empty()
     bg_track = AudioSegment.empty()
 
-    sil = AudioSegment.silent(duration=1000)
+    sil = AudioSegment.silent(duration=5000)
     padding = 1000
     intro_sound = AudioSegment.from_mp3("bell.mp3")
 
