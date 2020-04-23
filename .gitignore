@@ -1,4 +1,7 @@
 venv/
+.venv/
+recordings/
+data/
 text-to-speech-key.json
 .DS_Store
 __pycache__
