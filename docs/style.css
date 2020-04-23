@@ -28,6 +28,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: scroll;
 }
 .inner-container {
   display: flex;
@@ -78,4 +79,18 @@ a {
 }
 iframe {
   opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .container {
+    display: block;
+  }
+  .inner-container {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 30px;
+    margin: 0;
+  }
 }
