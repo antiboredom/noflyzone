@@ -3,19 +3,29 @@ YOUTUBE_URL="rtmp://a.rtmp.youtube.com/live2"
 TWITCH_URL="rtmp://live-jfk.twitch.tv/app/"
 KEY=""
 
+# make sure recordings exists
+mkdir -p recordings
+
+# make sure data exists
+mkdir -p data
+
 # remove old recordings
 rm recordings/*.wav
 
-# activate
-source venv/bin/activate
+# activate virtualenv if necessary
+if [ "x$VIRTUAL_ENV" == "x" ] ; then
+    source venv/bin/activate
+fi
 
 # create new recordings
 python generate.py
 
 # apply reverb and "megaphone" effect
-for f in recordings/*.wav
+for f in recordings/*.mp3
 do
-  sox "$f" "$f.effect.wav" reverb 10 sinc 400-5005
+    # convert to wav
+    ffmpeg -i "$f" -acodec pcm_u8 -ar 22050 "$f.wav"
+    sox "$f.wav" "$f.effect.wav" reverb 10 sinc 400-5005
 done
 
 # stitch recordings together
@@ -33,14 +43,14 @@ ffmpeg -y -f concat -safe 0 -i concatlist.txt -c copy audiotrack.wav
 pkill -9 ffmpeg
 
 # start new stream
-ffmpeg \
-  -re -loop 1 -i bg.jpg \
-  -stream_loop -1 \
-  -i audiotrack.wav -c:a aac \
-  -s 1280x720 -ab 128k \
-  -vcodec libx264 -pix_fmt yuv420p \
-  -maxrate 2048k -bufsize 2048k \
-  -preset ultrafast \
-  -framerate 30 \
-  -g 2 -strict experimental \
-  -f flv "$TWITCH_URL/$KEY" &
+# ffmpeg \
+#   -re -loop 1 -i bg.jpg \
+#   -stream_loop -1 \
+#   -i audiotrack.wav -c:a aac \
+#   -s 1280x720 -ab 128k \
+#   -vcodec libx264 -pix_fmt yuv420p \
+#   -maxrate 2048k -bufsize 2048k \
+#   -preset ultrafast \
+#   -framerate 30 \
+#   -g 2 -strict experimental \
+#   -f flv "$TWITCH_URL/$KEY" &
