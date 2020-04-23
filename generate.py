@@ -1,16 +1,22 @@
 import re
 import time
 import json
+
 from subprocess import call
 import random
 from glob import glob
 from requests_html import HTMLSession
+
 import requests
 from pydub import AudioSegment
 
-# from google.cloud import texttospeech
+# Uncomment the following line if you would rather use MSFT's library for
+# text-to-speech.
 # import mstextexample
-# client = texttospeech.TextToSpeechClient()
+
+from google.cloud import texttospeech
+client = texttospeech.TextToSpeechClient()
+
 
 HIDE_DATE = True
 
@@ -19,6 +25,7 @@ with open("text-to-speech-key.json", "r") as infile:
 
 
 def get_data():
+    """Grab and parse the data from the desired page on the IATA website."""
     session = HTMLSession()
     r = session.get(
         "https://www.iatatravelcentre.com/international-travel-document-news/1580226297.htm"
@@ -64,6 +71,10 @@ def post_audio(src, dest):
 
 
 def synthesize_google(text, outname):
+    """Call Google's API for text-to-speech.
+
+    This calls google cloud's API to perform text-to-speech and dump
+    the created .wav file into the desired outname."""
     synthesis_input = texttospeech.types.SynthesisInput(text=text)
 
     voice = texttospeech.types.VoiceSelectionParams(
@@ -73,7 +84,7 @@ def synthesize_google(text, outname):
     )
 
     audio_config = texttospeech.types.AudioConfig(
-        audio_encoding=texttospeech.enums.AudioEncoding.MP3,
+        audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16,
         speaking_rate=1.0,
         pitch=1.0,
     )
@@ -85,11 +96,14 @@ def synthesize_google(text, outname):
 
 
 def synthesize_local(text, outname):
+    """This is unused."""
     call(["say", "-o", outname, text])
     return outname
 
-
 def synthesize_ms(text, outname):
+    """Calls Microsoft's API for text-to-speech.
+
+    This is currently unused."""
     token_url = "https://eastus.api.cognitive.microsoft.com/sts/v1.0/issuetoken"
     headers = {"Ocp-Apim-Subscription-Key": KEYS["ms_key"]}
     response = requests.post(token_url, headers=headers)
@@ -275,21 +289,26 @@ def stitch():
 def create_recordings(items):
     for country, text in items:
 
-        print(country, text)
+        # print(country, text)
         safe_name = re.sub("[^aA-zZ]", "", country)
 
-        outname = "recordings/{}.wav".format(safe_name)
+        outname = f"recordings/{safe_name}.wav"
 
         text = "Attention all passengers traveling to {}.\n{}".format(country, text)
 
         try:
-            synthesize_ms(text, outname)
+            # Uncomment the following line to use the microsoft API
+            # synthesize_ms(text, outname)
 
+            # Comment the following line if you do not want to use Google's API.
+            synthesize_google(text, outname)
+
+            print(f"Wrote out {outname}")
         except Exception as e:
             print(e)
-            continue
 
-        time.sleep(3)
+        # UNcomment the following should you wish to use the microsoft API.
+        # time.sleep(3)
 
 
 def main():
