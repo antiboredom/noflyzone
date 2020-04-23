@@ -21,8 +21,11 @@ async function init() {
   let res = await fetch("parsed_results.json");
   let data = await res.json();
 
-  const fromColors = ["rgba(0, 255, 255, 0.4)", "rgba(255, 255, 0, 0.4)"];
-  const toColors = ["rgba(52, 98, 247, 0.8)", "rgba(255, 0, 0, 0.8)"];
+  const fromColors = ["rgba(250, 198, 14, 0.4)", "rgba(250, 198, 14, 0.4)"];
+  const toColors = ["rgba(50, 167, 13, 0.8)", "rgba(210, 0, 30, 0.8)"];
+
+  // const fromColors = ["rgba(0, 255, 255, 0.4)", "rgba(255, 255, 0, 0.4)"];
+  // const toColors = ["rgba(46, 191, 44, 0.8)", "rgba(255, 0, 0, 0.8)"];
 
   // const fromColors = ["rgb(0, 255, 255)", "rgb(255, 255, 0)"];
   // const toColors = ["rgb(0, 255, 0)", "rgb(255, 0, 0)"];
@@ -89,6 +92,7 @@ async function init() {
   // Setup renderer
   const renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor(0x1a1a1a, 1);
   document.getElementById("globeViz").appendChild(renderer.domElement);
 
   // Setup scene
