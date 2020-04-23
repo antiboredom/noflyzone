@@ -13,7 +13,7 @@ with open("country-names.txt", "r") as infile:
 
 country_pat = "|".join(countries)
 
-filename = glob("data/*.txt")[0]
+filename = sorted(glob("data/*.txt"))[-1]
 with open(filename, "r") as infile:
     content = infile.read()
 
