@@ -21,11 +21,9 @@ fi
 python generate.py
 
 # apply reverb and "megaphone" effect
-for f in recordings/*.mp3
+for f in recordings/*.wav
 do
-    # convert to wav
-    ffmpeg -i "$f" -acodec pcm_u8 -ar 22050 "$f.wav"
-    sox "$f.wav" "$f.effect.wav" reverb 10 sinc 400-5005
+    sox "$f" "$f.effect.wav" reverb 10 sinc 400-5005
 done
 
 # stitch recordings together

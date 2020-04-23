@@ -60,7 +60,7 @@ def get_data():
 
 def post_audio(src, dest):
     if dest is None:
-        dest = src + ".effect.mp3"
+        dest = src + ".effect.wav"
 
     args = [src, dest, "reverb", "10", "sinc", "400-5005"]
     call(args)
@@ -71,7 +71,7 @@ def synthesize_google(text, outname):
     """Call Google's API for text-to-speech.
 
     This calls google cloud's API to perform text-to-speech and dump
-    the created .mp3 file into the desired outname."""
+    the created .wav file into the desired outname."""
     synthesis_input = texttospeech.types.SynthesisInput(text=text)
 
     voice = texttospeech.types.VoiceSelectionParams(
@@ -81,7 +81,7 @@ def synthesize_google(text, outname):
     )
 
     audio_config = texttospeech.types.AudioConfig(
-        audio_encoding=texttospeech.enums.AudioEncoding.MP3,
+        audio_encoding=texttospeech.enums.AudioEncoding.LINEAR16,
         speaking_rate=1.0,
         pitch=1.0,
     )
@@ -152,7 +152,7 @@ def main():
         # print(country, text)
         safe_name = re.sub("[^aA-zZ]", "", country)
 
-        outname = f"recordings/{safe_name}.mp3"
+        outname = f"recordings/{safe_name}.wav"
 
         text = country + "... \n" + text
 
