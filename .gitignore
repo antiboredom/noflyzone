@@ -4,5 +4,6 @@ text-to-speech-key.json
 __pycache__
 testing/
 concatlist.txt
+recordings/
 *.wav
 *.mp4

@@ -1,77 +1,31 @@
-//https://deck.gl/#/documentation/deckgl-api-reference/layers/arc-layer?section=installation
-//
-const tt = document.getElementById("tooltip");
-const debug = false;
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2 - lat1); // deg2rad below
+  var dLon = deg2rad(lon2 - lon1);
+  var a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  var d = R * c; // Distance in km
+  return d;
+}
 
-let dgl;
+function deg2rad(deg) {
+  return deg * (Math.PI / 180);
+}
 
 async function init() {
-  function rotateCamera(timestamp) {
-    const bearing = (timestamp / 900) % 360;
-
-    let zoom = 1 + timestamp / 20000;
-    if (zoom > zoomTarget) zoom = zoomTarget;
-
-    let pitch = timestamp / 600;
-    if (pitch > pitchTarget) pitch = pitchTarget;
-
-    const lon = 0;
-    const lat = 0;
-
-    // const lon = Math.sin(timestamp / 10000) * 10;
-    // const lat = Math.cos(timestamp / 10000) * 10;
-
-    // console.log(zoom, pitch);
-    // const zoom = Math.abs(Math.sin(timestamp / 10000)) * 1 + 1;
-    // const pitch = Math.abs(Math.sin(timestamp / 10000)) * 60;
-
-    deckgl.setProps({
-      viewState: {
-        longitude: lon,
-        latitude: lat,
-        bearing: bearing,
-        zoom: zoom,
-        pitch: pitch,
-      },
-    });
-
-    requestAnimationFrame(rotateCamera);
-  }
-
-  const pitchTarget = 60;
-  const zoomTarget = 2;
-
   let res = await fetch("parsed_results.json");
   let data = await res.json();
 
-  const fromColors = [
-    [0, 255, 255, 80],
-    [255, 255, 0, 80],
-  ];
+  const fromColors = ["rgba(0, 255, 255, 0.4)", "rgba(255, 255, 0, 0.4)"];
+  const toColors = ["rgba(0, 255, 0, 0.8)", "rgba(255, 0, 0, 0.8)"];
 
-  const toColors = [
-    [0, 255, 0, 200],
-    [255, 0, 0, 200],
-  ];
-
-  const deckgl = new deck.DeckGL({
-    mapboxApiAccessToken:
-      "pk.eyJ1Ijoic3BsYXZpZ25lIiwiYSI6ImNrOTRxOGl3dzAxb3czZnE5c3B6ZmFtdWMifQ.sSnfEHis7T6DsuBlKDATfw",
-    // mapStyle: "mapbox://styles/splavigne/ck94w3u371mgg1iqmo2ccfigs",
-    mapStyle: "mapbox://styles/splavigne/ck94yb3hd2plm1io3k0noxct0",
-    initialViewState: {
-      longitude: 0,
-      latitude: 0,
-      zoom: 1,
-      maxZoom: 15,
-      pitch: 0,
-      bearing: 0,
-    },
-    controller: true,
-    layers: [],
-  });
-
-  dgl = deckgl;
+  // const fromColors = ["rgb(0, 255, 255)", "rgb(255, 255, 0)"];
+  // const toColors = ["rgb(0, 255, 0)", "rgb(255, 0, 0)"];
 
   let arcs = [];
 
@@ -82,12 +36,16 @@ async function init() {
       sourceName = sourceName.toUpperCase();
       if (data[sourceName]) {
         const source = [data[sourceName].lon, data[sourceName].lat];
+        const a = source[0] - target[0];
+        const b = source[1] - target[1];
         arcs.push({
-          source: source,
-          target: target,
-          type: 0,
-          fromName: sourceName,
-          toName: country,
+          startLat: source[1],
+          startLng: source[0],
+          endLat: target[1],
+          endLng: target[0],
+          // arcAltitude: Math.random(),
+          // arcAltitude: getDistanceFromLatLonInKm(source[1], source[0], target[1], target[0]) / 17000,
+          color: [fromColors[0], toColors[0]],
         });
       }
     }
@@ -96,54 +54,102 @@ async function init() {
       sourceName = sourceName.toUpperCase();
       if (data[sourceName]) {
         const source = [data[sourceName].lon, data[sourceName].lat];
+        const a = source[0] - target[0];
+        const b = source[1] - target[1];
         arcs.push({
-          source: source,
-          target: target,
-          type: 1,
-          fromName: sourceName,
-          toName: country,
+          startLat: source[1],
+          startLng: source[0],
+          endLat: target[1],
+          endLng: target[0],
+          // arcAltitude: Math.sqrt(a * a + b * b) / 300,
+          // arcAltitude: getDistanceFromLatLonInKm(source[1], source[0], target[1], target[0]) / 17000,
+          color: [fromColors[1], toColors[1]],
         });
       }
     }
   });
 
-  const arcLayer = new deck.ArcLayer({
-    id: "arc",
-    data: arcs,
-    pickable: true,
-    getSourcePosition: (d) => d.source,
-    getTargetPosition: (d) => d.target,
-    getSourceColor: (d) => fromColors[d.type],
-    getTargetColor: (d) => toColors[d.type],
-    getWidth: 5,
-    getHeight: 0.5,
-    getTilt: () => Math.random() * 40 - 20,
-    onHover: ({ object, x, y }) => {
-      if (!debug) return;
+  const Globe = new ThreeGlobe()
+    // .globeImageUrl("//unpkg.com/three-globe/example/img/earth-night.jpg")
+    // .globeImageUrl("//unpkg.com/three-globe/example/img/earth-blue-marble.jpg")
+    .globeImageUrl("bwmap1.png")
+    // .globeImageUrl("bwmap2.png")
+    // .globeImageUrl("shutterstock.webp")
+    // .globeImageUrl("water_16k.png")
+    .showAtmosphere(false)
+    // .showGraticules(true)
+    // .arcsData(arcsData)
+    .arcsData(arcs)
+    // .arcStroke(0.4)
+    .arcStroke(0.5)
+    // .arcAltitude("arcAltitude")
+    .arcAltitudeAutoScale(0.45)
+    .arcColor("color");
 
-      if (object) {
-        const tooltip = `${object.fromName} to ${object.toName} ${object.target}, ${object.source}`;
-        tt.innerHTML = tooltip;
-        tt.style.display = "block";
-        tt.style.left = x + "px";
-        tt.style.top = y + "px";
-      }
-    },
-  });
+  // Setup renderer
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.getElementById("globeViz").appendChild(renderer.domElement);
 
-  deckgl.setProps({
-    layers: [arcLayer],
+  // Setup scene
+  const scene = new THREE.Scene();
+  scene.add(Globe);
+  scene.add(new THREE.AmbientLight(0xbbbbbb));
+  scene.add(new THREE.DirectionalLight(0xffffff, 0.6));
+
+  // Setup camera
+  const camera = new THREE.PerspectiveCamera();
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  camera.position.z = 230;
+
+  // Add camera controls
+  const tbControls = new TrackballControls(camera, renderer.domElement);
+  tbControls.minDistance = 101;
+  tbControls.rotateSpeed = 2;
+  tbControls.zoomSpeed = 0.1;
+
+  window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
   const play = document.getElementById("radio-button");
   const audio = document.getElementById("radio");
+  const about = document.getElementById("about");
+  const container = document.querySelector(".inner-container");
 
   play.addEventListener("click", () => {
     audio.play();
-    play.style.display = "none";
+    // container.style.display = "none";
+    // document.querySelector(".container").style.background =
+    // "rgba(0, 0, 0, 0.5)";
+    document.querySelector(".container").style.display = "none";
+    about.style.display = "block";
+
+    // document.querySelector("#video").src += "?autoplay=1";
+    // play.style.display = "none";
   });
 
-  rotateCamera(0);
+  about.addEventListener("click", () => {
+    container.style.display = "flex";
+    about.style.display = "none";
+    document.querySelector(".container").style.display = "flex";
+    // document.querySelector(".container").style.background =
+    // "rgba(0, 0, 0, 0.9)";
+    // play.style.display = "none";
+  });
+
+  function animate() {
+    tbControls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+    Globe.rotation.x += 0.0001;
+    Globe.rotation.y += 0.0002;
+  }
+
+  animate();
 }
 
 init();

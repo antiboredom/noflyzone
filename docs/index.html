@@ -7,43 +7,71 @@
       name="viewport"
       content="initial-scale=1,maximum-scale=1,user-scalable=no"
     />
-    <script src="https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.js"></script>
-    <link
-      href="https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.css"
-      rel="stylesheet"
-    />
-    <script src="https://unpkg.com/deck.gl@latest/dist.min.js"></script>
+
+    <script src="//unpkg.com/three"></script>
+    <script src="//unpkg.com/three-trackballcontrols-web/dist/three-trackballcontrols.min.js"></script>
+    <script src="three-globe.min.js"></script>
     <link href="style.css" rel="stylesheet" />
-    <style></style>
   </head>
+
   <body>
-    <div id="tooltip"></div>
-    <button id="radio-button">
-      <h1>No Fly Free Zone</h1>
-      <p>
-        Rule One: Every rule has an exception, but no one is sure what it is.
-      </p>
-      <p>
-        Every day IATA (International Air Transport Association) publishes an
-        updated set of rules from member states defining who is and isn’t
-        permitted to enter the respective countries under various Covid-19
-        lockdown regimes. Each day this list grows longer with contronyms,
-        paradoxes, and complex, seemingly arbitrary sub-clauses that produce
-        multifold exceptions. The more information-rich this schematic becomes
-        the less legible it is. Occasionally, new parameters clash with prior
-        parameters and apparently contradictory guidelines are obtained. Some
-        rules disappear entirely without explanation. This is a process by which
-        an explicit and temporary state of exception becomes an overt and
-        semi-permanent anomaly that is integrated in the normal run of quotidian
-        life. A condition in which the definitive interpretation of the rule
-        belongs solely to those who impose it. While observing the process of
-        global reterritorialization doesn’t always make clear who is and isn’t
-        permitted to cross which borders, the overarching mechanisms and ensuing
-        chaos that produces the state of exception becomes briefly traceable.
-      </p>
-      <h2>&#9658; Listen</h2>
-    </button>
-    <audio id="radio" src="radio.mp3" loop></audio>
+    <div id="globeViz"></div>
+    <!-- <iframe id="video" width="560" height="315" 
+      src="https://www.youtube&#45;nocookie.com/embed/wf&#45;RnzO1Nbs" 
+      frameborder="0" allow="accelerometer; autoplay; encrypted&#45;media; gyroscope; picture&#45;in&#45;picture"
+      allowfullscreen></iframe> -->
+    <button id="about">About</button>
+    <div class="container">
+      <div class="inner-container">
+        <div>
+          <h1>NO FLY FREE ZONE</h1>
+          <p>
+            Rule One: Every rule has an exception, but no one is sure what it
+            is.
+          </p>
+
+          <p>
+            Every day IATA (International Air Transport Association) publishes
+            an updated set of rules from member states defining who is and isn’t
+            permitted to enter the respective countries under various Covid-19
+            lockdown regimes. Each day this list grows longer with contronyms,
+            paradoxes, and complex, seemingly arbitrary sub-clauses that produce
+            multifold exceptions. The more information-rich the schematic
+            becomes, the less legible it is. Occasionally, new parameters clash
+            with prior parameters and apparently contradictory guidelines are
+            obtained. Rules disappear entirely and new rules appear overnight.
+            This is a process by which an explicit and temporary state of
+            exception develops into an overt and semi-permanent anomaly that is
+            integrated in quotidian life, a condition in which the definitive
+            interpretation of the rule belongs solely to those who impose it.
+            While observing the process of global reterritorialization doesn’t
+            always make clear who is and isn’t permitted to cross which borders,
+            it does provide a genealogy of the process by which information
+            outlaws are created.
+          </p>
+
+          <p>
+            No Fly Free Zone is an automated live broadcast of the individual
+            nation state travel restrictions as published by the IATA. The
+            broadcast is continuous and is updated perennially to incorporate
+            changes as they become available on the IATA website. Download the
+            source code for this work <a href="https://github.com/antiboredom/noflyzone">here</a>.
+          </p>
+
+          <p>
+            This work is a transatlantic collaboration between artists
+            <a href="https://www.maribastashevski.com/">Mari Bastashevski</a> & 
+            <a href="https://lav.io">Sam Lavigne</a>.
+          </p>
+
+          <button id="radio-button">
+            &#9658; Play
+          </button>
+        </div>
+      </div>
+    </div>
+    <audio id="radio" src="https://lav.io/radio.mp3" loop></audio>
     <script src="app.js"></script>
   </body>
 </html>
+
