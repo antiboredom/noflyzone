@@ -22,7 +22,7 @@ async function init() {
   let data = await res.json();
 
   const fromColors = ["rgba(0, 255, 255, 0.4)", "rgba(255, 255, 0, 0.4)"];
-  const toColors = ["rgba(46, 191, 44, 0.8)", "rgba(255, 0, 0, 0.8)"];
+  const toColors = ["rgba(52, 98, 247, 0.8)", "rgba(255, 0, 0, 0.8)"];
 
   // const fromColors = ["rgb(0, 255, 255)", "rgb(255, 255, 0)"];
   // const toColors = ["rgb(0, 255, 0)", "rgb(255, 0, 0)"];
