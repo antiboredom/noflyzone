@@ -97,6 +97,9 @@ header {
   /* align-items: center; */
   /* justify-content: space-between; */
 }
+#player {
+  display: none;
+}
 
 @media (max-width: 768px) {
   .container {
