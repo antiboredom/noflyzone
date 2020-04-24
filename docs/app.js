@@ -83,7 +83,7 @@ async function init() {
     }
   });
 
-  const Globe = new ThreeGlobe()
+  const Globe = new ThreeGlobe({animateIn: false})
     // .globeImageUrl("//unpkg.com/three-globe/example/img/earth-night.jpg")
     // .globeImageUrl("//unpkg.com/three-globe/example/img/earth-blue-marble.jpg")
     .globeImageUrl("bwmap1.png")
@@ -116,7 +116,7 @@ async function init() {
   const camera = new THREE.PerspectiveCamera();
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  camera.position.z = 230;
+  camera.position.z = 240;
 
   // Add camera controls
   const tbControls = new TrackballControls(camera, renderer.domElement);
