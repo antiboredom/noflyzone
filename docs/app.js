@@ -23,11 +23,11 @@ async function init() {
   const about = document.getElementById("about");
   const container = document.querySelector(".inner-container");
 
-  const twitchPlayer = new Twitch.Player("player", {
-    width: 400,
-    height: 400,
-    channel: "noflyzoneradio",
-  });
+  // const twitchPlayer = new Twitch.Player("player", {
+  //   width: 400,
+  //   height: 400,
+  //   channel: "noflyzoneradio",
+  // });
 
   let res = await fetch("parsed_results.json");
   let data = await res.json();
@@ -131,8 +131,8 @@ async function init() {
   });
 
   play.addEventListener("click", () => {
-    // audio.play();
-    twitchPlayer.setMuted(false);
+    audio.play();
+    // twitchPlayer.setMuted(false);
     document.querySelector(".container").style.display = "none";
     about.style.display = "block";
   });
