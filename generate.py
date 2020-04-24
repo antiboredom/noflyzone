@@ -1,12 +1,16 @@
 import re
 import time
 import json
-from subprocess import call
+from subprocess import call, check_output
 import random
 from glob import glob
 from requests_html import HTMLSession
 import requests
 from pydub import AudioSegment
+import audiofile
+import numpy as np
+from scipy import signal
+
 
 # from google.cloud import texttospeech
 # import mstextexample
@@ -18,17 +22,22 @@ with open("text-to-speech-key.json", "r") as infile:
     KEYS = json.load(infile)
 
 
-def get_data():
-    session = HTMLSession()
-    r = session.get(
-        "https://www.iatatravelcentre.com/international-travel-document-news/1580226297.htm"
-    )
+def get_data(data_filename=None):
+    if data_filename is None:
+        session = HTMLSession()
+        r = session.get(
+            "https://www.iatatravelcentre.com/international-travel-document-news/1580226297.htm"
+        )
 
-    content = r.html.find(".middle", first=True).text
+        content = r.html.find(".middle", first=True).text
 
-    data_filename = time.strftime("%Y-%m-%d-%H-%M") + ".txt"
-    with open("data/" + data_filename, "w") as outfile:
-        outfile.write(content)
+        data_filename = time.strftime("%Y-%m-%d-%H-%M") + ".txt"
+        with open("data/" + data_filename, "w") as outfile:
+            outfile.write(content)
+
+    else:
+        with open(data_filename, "r") as infile:
+            content = infile.read()
 
     content = content.replace("–", "-")
 
@@ -135,7 +144,7 @@ def synthesize_ms(text, outname):
 def add_effects():
     print("adding effects")
     for f in glob("recordings/*.wav"):
-        if "effect" in f or "mixed" in f:
+        if "effect" in f or "mixed" in f or "noise" in f:
             continue
         call(["sox", f, f + ".effect.wav", "reverb", "10", "sinc", "400-5005"])
 
@@ -154,6 +163,77 @@ def add_effects():
                 f + ".mixed.wav",
             ]
         )
+
+
+def stitch3():
+    files = glob("recordings/*.mixed.wav")
+    # files = sorted(files)
+    random.shuffle(files)
+
+    out_fg = []
+    out_bg = []
+
+    for f in files:
+        out_fg.append(f)
+        out_fg.append("silence_fg.wav")
+
+        out_bg.append(f + ".noise.wav")
+        out_bg.append("silence_bg.wav")
+
+    out_fg = ["file '{}'".format(f) for f in out_fg]
+    out_bg = ["file '{}'".format(f) for f in out_bg]
+
+    with open("concatlist_fg.txt", "w") as outfile:
+        outfile.write("\n".join(out_fg))
+
+    with open("concatlist_bg.txt", "w") as outfile:
+        outfile.write("\n".join(out_bg))
+
+    args = [
+        "ffmpeg",
+        "-y",
+        "-f",
+        "concat",
+        "-safe",
+        "0",
+        "-i",
+        "concatlist_fg.txt",
+        "-c",
+        "copy",
+        "fg.wav",
+    ]
+    call(args)
+
+    args = [
+        "ffmpeg",
+        "-y",
+        "-f",
+        "concat",
+        "-safe",
+        "0",
+        "-i",
+        "concatlist_bg.txt",
+        "-c",
+        "copy",
+        "bg.wav",
+    ]
+    call(args)
+
+    overlay_args = [
+        "ffmpeg",
+        "-y",
+        "-i",
+        "fg.wav",
+        "-i",
+        "bg.wav",
+        "-i",
+        "noise.wav",
+        "-filter_complex",
+        "amix=inputs=3:duration=shortest",
+        "docs/radio.mp3",
+    ]
+
+    call(overlay_args)
 
 
 def stitch2():
@@ -201,6 +281,34 @@ def stitch2():
     ]
 
     call(overlay_args)
+
+
+def make_noise(text_length, filename):
+    # checking audio file to match with
+    nb_samples = audiofile.samples(filename)
+    sampling_rate = audiofile.sampling_rate(filename)  # in Hz
+
+    # Generate random logarithmic noise
+    noise = np.random.lognormal(0, 1, nb_samples)
+    noise /= np.amax(np.abs(noise))
+
+    # Filter with bandpass filter
+    nyq = 0.5 * sampling_rate
+    low = text_length / nyq
+    high = (50 + text_length) / nyq
+    order = 1
+    b, a = signal.butter(order, [low, high], btype="band")
+    filtered_noise = signal.lfilter(b, a, noise)
+
+    # create Gaussian enveloppe
+    t = np.linspace(start=-0.5, stop=0.5, num=nb_samples, endpoint=False)
+    i, e = signal.gausspulse(t, fc=5, retenv=True, bwr=-6.0)
+    out_signal = np.multiply(filtered_noise, e)
+    out_signal *= 30
+
+    # write audio file
+    audiofile.write(filename + ".noise.wav", out_signal, sampling_rate)
+    print("text length was :", text_length)
 
 
 def generate_bgs():
@@ -272,6 +380,14 @@ def stitch():
     final_track.export("docs/radio.mp3", format="mp3")
 
 
+def create_backgrounds(items):
+    for country, text in items:
+        safe_name = re.sub("[^aA-zZ]", "", country)
+        outname = "recordings/{}.wav.mixed.wav".format(safe_name)
+        text = "Attention all passengers traveling to {}.\n{}".format(country, text)
+        make_noise(len(text), outname)
+
+
 def create_recordings(items):
     for country, text in items:
 
@@ -296,7 +412,6 @@ def main():
 
     # add_effects()
     # generate_bgs()
-    # stich2()
     # stitch()
     #
     # return False
@@ -304,7 +419,8 @@ def main():
     items = get_data()
     create_recordings(items)
     add_effects()
-    stitch2()
+    create_backgrounds(items)
+    stitch3()
 
 
 if __name__ == "__main__":

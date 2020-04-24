@@ -32,6 +32,8 @@ ffmpeg -y -f concat -safe 0 -i concatlist.txt -c copy audiotrack.wav
 # kill previous stream
 pkill -9 ffmpeg
 
+#sox -n noise.wav synth pinknoise 0.1 99 trim 0.0 04:00:00
+
 # start new stream
 ffmpeg \
   -re -loop 1 -i bg.jpg \
