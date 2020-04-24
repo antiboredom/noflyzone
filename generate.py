@@ -174,11 +174,12 @@ def stitch3():
     out_bg = []
 
     for f in files:
-        out_fg.append(f)
-        out_fg.append("silence_fg.wav")
+        if os.path.exists(f) and os.path.exists(f + ".noise.wav"):
+            out_fg.append(f)
+            out_fg.append("silence_fg.wav")
 
-        out_bg.append(f + ".noise.wav")
-        out_bg.append("silence_bg.wav")
+            out_bg.append(f + ".noise.wav")
+            out_bg.append("silence_bg.wav")
 
     out_fg = ["file '{}'".format(f) for f in out_fg]
     out_bg = ["file '{}'".format(f) for f in out_bg]
@@ -382,10 +383,13 @@ def stitch():
 
 def create_backgrounds(items):
     for country, text in items:
-        safe_name = re.sub("[^aA-zZ]", "", country)
-        outname = "recordings/{}.wav.mixed.wav".format(safe_name)
-        text = "Attention all passengers traveling to {}.\n{}".format(country, text)
-        make_noise(len(text), outname)
+        try:
+            safe_name = re.sub("[^aA-zZ]", "", country)
+            outname = "recordings/{}.wav.mixed.wav".format(safe_name)
+            text = "Attention all passengers traveling to {}.\n{}".format(country, text)
+            make_noise(len(text), outname)
+        except Exception as e:
+            print(e)
 
 
 def create_recordings(items):
