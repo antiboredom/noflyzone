@@ -231,7 +231,7 @@ def stitch3():
         "-i",
         "noise.wav",
         "-filter_complex",
-        "amix=inputs=3:duration=shortest,volume=1.5",
+        "amix=inputs=3:duration=shortest,volume=3.0",
         "docs/radio.mp3",
     ]
 
