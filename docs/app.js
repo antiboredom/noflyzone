@@ -23,12 +23,6 @@ async function init() {
   const about = document.getElementById("about");
   const container = document.querySelector(".inner-container");
 
-  // const twitchPlayer = new Twitch.Player("player", {
-  //   width: 400,
-  //   height: 400,
-  //   channel: "noflyzoneradio",
-  // });
-
   let res = await fetch("parsed_results.json");
   let data = await res.json();
 
@@ -50,15 +44,11 @@ async function init() {
       sourceName = sourceName.toUpperCase();
       if (data[sourceName]) {
         const source = [data[sourceName].lon, data[sourceName].lat];
-        const a = source[0] - target[0];
-        const b = source[1] - target[1];
         arcs.push({
           startLat: source[1],
           startLng: source[0],
           endLat: target[1],
           endLng: target[0],
-          // arcAltitude: Math.random(),
-          // arcAltitude: getDistanceFromLatLonInKm(source[1], source[0], target[1], target[0]) / 17000,
           color: [fromColors[0], toColors[0]],
         });
       }
@@ -68,15 +58,11 @@ async function init() {
       sourceName = sourceName.toUpperCase();
       if (data[sourceName]) {
         const source = [data[sourceName].lon, data[sourceName].lat];
-        const a = source[0] - target[0];
-        const b = source[1] - target[1];
         arcs.push({
           startLat: source[1],
           startLng: source[0],
           endLat: target[1],
           endLng: target[0],
-          // arcAltitude: Math.sqrt(a * a + b * b) / 300,
-          // arcAltitude: getDistanceFromLatLonInKm(source[1], source[0], target[1], target[0]) / 17000,
           color: [fromColors[1], toColors[1]],
         });
       }
@@ -84,19 +70,10 @@ async function init() {
   });
 
   const Globe = new ThreeGlobe({animateIn: false})
-    // .globeImageUrl("//unpkg.com/three-globe/example/img/earth-night.jpg")
-    // .globeImageUrl("//unpkg.com/three-globe/example/img/earth-blue-marble.jpg")
     .globeImageUrl("bwmap1.png")
-    // .globeImageUrl("bwmap2.png")
-    // .globeImageUrl("shutterstock.webp")
-    // .globeImageUrl("water_16k.png")
     .showAtmosphere(false)
-    // .showGraticules(true)
-    // .arcsData(arcsData)
     .arcsData(arcs)
-    // .arcStroke(0.4)
     .arcStroke(0.5)
-    // .arcAltitude("arcAltitude")
     .arcAltitudeAutoScale(0.45)
     .arcColor("color");
 
@@ -120,7 +97,8 @@ async function init() {
 
   // Add camera controls
   const tbControls = new TrackballControls(camera, renderer.domElement);
-  tbControls.minDistance = 101;
+  tbControls.minDistance = 110;
+  tbControls.maxDistance = 2000;
   tbControls.rotateSpeed = 2;
   tbControls.zoomSpeed = 0.1;
 
@@ -132,13 +110,11 @@ async function init() {
 
   play.addEventListener("click", () => {
     audio.play();
-    // twitchPlayer.setMuted(false);
     document.querySelector(".container").style.display = "none";
     about.style.display = "block";
   });
 
   about.addEventListener("click", () => {
-    container.style.display = "flex";
     about.style.display = "none";
     document.querySelector(".container").style.display = "flex";
   });
