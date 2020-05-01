@@ -421,10 +421,23 @@ def main():
     #
     # return False
 
+    print("getting data")
     items = get_data()
+    print("got {} item".format(len(items)))
+    
+    if len(items) == 0:
+        for f in sorted(glob("data/*.txt"), reverse=True):
+            items = get_data(f)
+            if len(items) > 0:
+                break
+
+    print("creating recordings")
     create_recordings(items)
+    print("adding effects")
     add_effects()
+    print("creating noise")
     create_backgrounds(items)
+    print("stitching")
     stitch3()
 
 
