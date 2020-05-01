@@ -80,7 +80,7 @@ async function init() {
   // Setup renderer
   const renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(0x1a1a1a, 1);
+  renderer.setClearColor(0xe1e1e1, 1);
   document.getElementById("globeViz").appendChild(renderer.domElement);
 
   // Setup scene
@@ -93,7 +93,7 @@ async function init() {
   const camera = new THREE.PerspectiveCamera();
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  camera.position.z = 240;
+  camera.position.z = 290;
 
   // Add camera controls
   const tbControls = new TrackballControls(camera, renderer.domElement);
