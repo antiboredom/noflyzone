@@ -10,7 +10,10 @@ import requests
 from pydub import AudioSegment
 import audiofile
 import numpy as np
+import demjson
+import html
 from scipy import signal
+import csv
 
 
 # from google.cloud import texttospeech
@@ -23,6 +26,14 @@ with open("text-to-speech-key.json", "r") as infile:
     KEYS = json.load(infile)
 
 
+COUNTRY_KEYS = {}
+
+with open("countries.csv", "r") as infile:
+    reader = csv.DictReader(infile)
+    for row in reader:
+        COUNTRY_KEYS[row["code"]] = row["name"]
+
+
 def get_data(data_filename=None):
     if data_filename is None:
         session = HTMLSession()
@@ -31,37 +42,31 @@ def get_data(data_filename=None):
         )
 
         content = r.html.find(".middle", first=True).text
+        extract = re.search(
+            r"var svgMapDataGPD = ({.*)new svgMap", content, re.MULTILINE | re.DOTALL
+        ).group(1)
 
         data_filename = time.strftime("%Y-%m-%d-%H-%M") + ".txt"
         with open("data/" + data_filename, "w") as outfile:
-            outfile.write(content)
+            outfile.write(extract)
 
     else:
         with open(data_filename, "r") as infile:
-            content = infile.read()
+            extract = infile.read()
 
-    content = content.replace("–", "-")
+    data = demjson.decode(extract)["values"]
+    items = [html.unescape(data[k]["gdp"]) for k in data]
+    items = [re.sub("Published .*?<br/>", "", i) for i in items]
+    items = [re.sub("\(.*?\)", " ", i) for i in items]
+    items = [i.replace("<br>", " ").replace("<br/>", " ") for i in items]
+    items = [i.replace("–", "-") for i in items]
+    names = [COUNTRY_KEYS[k] for k in data]
 
-    content = re.sub("\n{2,}", "\n\n", content)
+    out = []
+    for i, item in enumerate(items):
+        out.append((names[i], item))
 
-    content = re.sub("\(.*?\)", " ", content)
-
-    items = re.split("\n\n", content)
-
-    items = [i for i in items if re.search("[A-Z]+ - published", i)]
-
-    content = content.replace(" (COVID-19)", "")
-
-    content = content.replace(" COVID-19", "covid nineteen")
-
-    if HIDE_DATE:
-        items = [re.sub(" - published .*", "", i) for i in items]
-
-    items = [i.split("\n") for i in items]
-
-    items = [(i[0], "\n".join(i[1:])) for i in items]
-
-    return items
+    return out
 
 
 def post_audio(src, dest):
@@ -424,7 +429,7 @@ def main():
     print("getting data")
     items = get_data()
     print("got {} item".format(len(items)))
-    
+
     if len(items) == 0:
         for f in sorted(glob("data/*.txt"), reverse=True):
             items = get_data(f)

@@ -4,6 +4,7 @@ from pprint import pprint
 import re
 import spacy
 import csv
+from generate import get_data
 
 nlp = spacy.load("en_core_web_sm")
 
@@ -14,24 +15,12 @@ with open("country-names.txt", "r") as infile:
 country_pat = "|".join(countries)
 
 filename = sorted(glob("data/*.txt"))[-1]
-with open(filename, "r") as infile:
-    content = infile.read()
-
-content = re.sub("\n{2,}", "\n\n", content)
-content = re.sub("\(.*?\)", " ", content)
-content = content.replace("–", "-")
-items = re.split("\n\n", content)
-items = [i for i in items if re.search("[A-Z]+ - published", i)]
-content = content.replace(" (COVID-19)", "")
-content = content.replace(" COVID-19", "covid nineteen")
-items = [re.sub(" - published .*", "", i) for i in items]
-items = [i.split("\n") for i in items]
-items = [(i[0], "\n".join(i[1:])) for i in items]
-
+items = get_data(filename)
 
 results = {}
 
 for country, data in items:
+    country = country.upper()
     print(country)
 
     doc = nlp(data)
@@ -39,7 +28,8 @@ for country, data in items:
     for sent in doc.sents:
         # print(sent.string)
         names = re.findall(country_pat, sent.string, flags=re.IGNORECASE)
-        names = [n for n in names if n.upper() != country.upper()]
+        names = [n.upper() for n in names]
+        names = [n for n in names if n != country]
         names = sorted(list(set(names)))
 
         if "quarantine" in sent.string:
@@ -58,17 +48,18 @@ for country, data in items:
             results[country]["good"] += names
 
 
+print(results)
 print('----')
 
 with open("countries.csv", "r") as infile:
     reader = csv.DictReader(infile)
     for row in reader:
         name = row["name"].upper()
+        print(name)
         if name in results:
             results[name]["lat"] = float(row["lat"])
             results[name]["lon"] = float(row["lon"])
         else:
-            print(name)
             results[name] = {"bad": [], "good": [], "transit": [], "quarantine": []}
             try:
                 results[name]["lat"] = float(row["lat"])
