@@ -33,7 +33,7 @@ pyquery==1.4.1
 pytz==2019.3
 requests==2.23.0
 requests-html==0.10.0
-rsa==4.0
+rsa==4.7
 six==1.14.0
 soupsieve==2.0
 spacy==2.2.4
